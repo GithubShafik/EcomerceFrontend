@@ -1,0 +1,16 @@
+export const paths = {
+  // root:'/',
+  logout: "/logout",
+  login: "/login",
+  dashboard: "/dashboard",
+  leads: "/leads",
+  lead_list: "/lead_list",
+  meetings: "/meetings",
+  meetingCustomer: "/meetingCustomer",
+  pipelines: "/pipelines",
+  product: "/product",
+  users: "users",
+  service_tickets: "/service_tickets",
+  bookings: "bookings",
+  tickets: "tickets",
+};
