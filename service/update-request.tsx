@@ -20,3 +20,13 @@ export const updateCart = async (data: any): Promise<any> => {
     throw error;
   }
 };
+
+export const updateProduct = async (id: string, data: any): Promise<any> => {
+  try {
+    const res = await axiosInstance.put(`${API_ENDPOINTS.getproducts}${id}`, data);
+    return res?.data;
+  } catch (error) {
+    console.log("Error Updating Product:", error);
+    throw error;
+  }
+};
