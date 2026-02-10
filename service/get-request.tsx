@@ -54,3 +54,13 @@ export const getproducts = async () => {
   }
 };
 
+export const getProductById = async (id: string) => {
+  try {
+    const res = await axiosInstance.get(`${API_ENDPOINTS.getproducts}${id}`);
+    return res?.data;
+  } catch (error) {
+    console.log("Error fetching product:", error);
+    throw error;
+  }
+};
+
