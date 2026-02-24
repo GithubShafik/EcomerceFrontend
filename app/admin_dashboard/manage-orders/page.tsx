@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -11,11 +12,12 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-import { Package, Loader2, RefreshCw, Users, DollarSign, ShoppingBag } from "lucide-react"
+import { Package, Loader2, RefreshCw, Users, DollarSign, ShoppingBag, Eye } from "lucide-react"
 import { getAllOrders, getOrderStatuses } from "@/service/get-request"
 import { updateOrderStatus } from "@/service/update-request"
 
 export default function ManageOrdersPage() {
+    const router = useRouter()
     const [orders, setOrders] = useState<any[]>([])
     const [statuses, setStatuses] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
@@ -214,13 +216,17 @@ export default function ManageOrdersPage() {
                                                     <th className="text-left py-4 px-4 font-semibold text-gray-700 text-sm">Date</th>
                                                     <th className="text-left py-4 px-4 font-semibold text-gray-700 text-sm">Status</th>
                                                     <th className="text-left py-4 px-4 font-semibold text-gray-700 text-sm">Update Status</th>
+                                                    <th className="text-left py-4 px-4 font-semibold text-gray-700 text-sm">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {orders.map((order: any) => (
                                                     <tr key={order._id} className="border-b hover:bg-gray-50 transition-colors">
                                                         <td className="py-4 px-4">
-                                                            <span className="font-mono text-sm font-medium text-blue-600">
+                                                            <span
+                                                                className="font-mono text-sm font-medium text-blue-600 cursor-pointer hover:underline"
+                                                                onClick={() => router.push(`/orders/${order._id}`)}
+                                                            >
                                                                 #{order._id.slice(-8).toUpperCase()}
                                                             </span>
                                                         </td>
@@ -277,6 +283,17 @@ export default function ManageOrdersPage() {
                                                                     </Select>
                                                                 )}
                                                             </div>
+                                                        </td>
+                                                        <td className="py-4 px-4">
+                                                            <Button
+                                                                variant="outline"
+                                                                size="sm"
+                                                                className="gap-1.5"
+                                                                onClick={() => router.push(`/orders/${order._id}`)}
+                                                            >
+                                                                <Eye className="h-4 w-4" />
+                                                                View Receipt
+                                                            </Button>
                                                         </td>
                                                     </tr>
                                                 ))}

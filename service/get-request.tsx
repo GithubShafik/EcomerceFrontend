@@ -94,3 +94,13 @@ export const getOrderStatuses = async () => {
   }
 };
 
+export const getOrderById = async (id: string) => {
+  try {
+    const res = await axiosInstance.get(`${API_ENDPOINTS.placeOeder}${id}`);
+    return res?.data;
+  } catch (error) {
+    console.log("Error fetching order:", error);
+    throw error;
+  }
+};
+

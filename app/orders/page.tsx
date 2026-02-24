@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -8,6 +9,7 @@ import { Package, Filter, Bell, Settings, Loader2 } from "lucide-react"
 import { getMyOrders } from "@/service/get-request"
 
 export default function OrdersPage() {
+  const router = useRouter()
   const [orders, setOrders] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -146,7 +148,12 @@ export default function OrdersPage() {
                             <p className="text-2xl font-bold text-gray-900">₹{order.totalAmount}</p>
                           </div>
                           <div className="flex flex-col space-y-2">
-                            <Button variant="outline" size="sm" className="border-2 bg-transparent">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="border-2 bg-transparent"
+                              onClick={() => router.push(`/orders/${order._id}`)}
+                            >
                               View Details
                             </Button>
                             {order.orderStatus?.name === "Delivered" && (
