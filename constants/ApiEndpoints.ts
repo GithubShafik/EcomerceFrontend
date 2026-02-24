@@ -8,7 +8,9 @@ export const API_ENDPOINTS = {
   getCart: "/cart/",
   getproducts: "/products/",
   placeOeder: "/orders/",
-  addCart:"/cart"
-
- 
+  addCart: "/cart",
+  getMyOrders: "/orders/me",
+  getAllOrders: "/orders/",
+  getOrderStatuses: "/orders/statuses",
+  updateOrderStatus: "/orders/",
 };

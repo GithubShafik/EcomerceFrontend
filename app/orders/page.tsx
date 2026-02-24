@@ -1,24 +1,33 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Package, Filter, Bell, Settings, LogOut, Home, ShoppingBag, User, ShoppingCart } from "lucide-react"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import AppSidebar from "@/components/app-sidebar"
+import { Package, Filter, Bell, Settings, Loader2 } from "lucide-react"
+import { getMyOrders } from "@/service/get-request"
 
 export default function OrdersPage() {
-  const router = useRouter()
+  const [orders, setOrders] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
-  const orders = [
-    { id: "ORD-2024-001", date: "2024-01-15", status: "Delivered", total: 449.98, items: 3 },
-    { id: "ORD-2024-002", date: "2024-01-10", status: "Shipped", total: 299.99, items: 1 },
-    { id: "ORD-2024-003", date: "2024-01-05", status: "Processing", total: 179.98, items: 2 },
-    { id: "ORD-2024-004", date: "2024-01-01", status: "Cancelled", total: 89.99, items: 1 },
-    { id: "ORD-2023-045", date: "2023-12-28", status: "Delivered", total: 234.5, items: 2 },
-    { id: "ORD-2023-044", date: "2023-12-20", status: "Delivered", total: 156.75, items: 1 },
-  ]
+  useEffect(() => {
+    fetchOrders()
+  }, [])
+
+  const fetchOrders = async () => {
+    try {
+      setLoading(true)
+      const data = await getMyOrders()
+      setOrders(data || [])
+    } catch (err: any) {
+      setError("Failed to load orders")
+      console.error(err)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -26,8 +35,11 @@ export default function OrdersPage() {
         return "bg-green-100 text-green-800 border-green-200"
       case "Shipped":
         return "bg-blue-100 text-blue-800 border-blue-200"
-      case "Processing":
+      case "Placed":
+      case "Packed":
         return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      case "Out for Delivery":
+        return "bg-purple-100 text-purple-800 border-purple-200"
       case "Cancelled":
         return "bg-red-100 text-red-800 border-red-200"
       default:
@@ -35,9 +47,16 @@ export default function OrdersPage() {
     }
   }
 
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    })
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex">
-      {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Top Header */}
         <header className="bg-white shadow-sm border-b px-8 py-6">
@@ -49,9 +68,6 @@ export default function OrdersPage() {
             <div className="flex items-center space-x-4">
               <Button variant="outline" size="icon" className="relative bg-transparent">
                 <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  3
-                </span>
               </Button>
               <Button variant="outline" size="icon">
                 <Settings className="h-5 w-5" />
@@ -74,50 +90,96 @@ export default function OrdersPage() {
               </Button>
             </div>
 
-            <div className="space-y-6">
-              {orders.map((order) => (
-                <Card key={order.id} className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
-                  <CardContent className="p-8">
-                    <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-                      <div className="flex items-center space-x-6">
-                        <div className="bg-blue-100 p-4 rounded-xl">
-                          <Package className="h-8 w-8 text-blue-600" />
+            {/* Loading State */}
+            {loading && (
+              <div className="flex items-center justify-center py-20">
+                <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
+                <span className="ml-3 text-gray-600 text-lg">Loading orders...</span>
+              </div>
+            )}
+
+            {/* Error State */}
+            {error && !loading && (
+              <div className="text-center py-20">
+                <p className="text-red-500 text-lg">{error}</p>
+                <Button onClick={fetchOrders} className="mt-4">
+                  Retry
+                </Button>
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!loading && !error && orders.length === 0 && (
+              <div className="text-center py-20">
+                <Package className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                <p className="text-gray-500 text-lg">No orders yet</p>
+                <p className="text-gray-400">Start shopping to see your orders here!</p>
+              </div>
+            )}
+
+            {/* Orders List */}
+            {!loading && !error && orders.length > 0 && (
+              <div className="space-y-6">
+                {orders.map((order: any) => (
+                  <Card key={order._id} className="border-0 shadow-md hover:shadow-lg transition-all duration-300">
+                    <CardContent className="p-8">
+                      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+                        <div className="flex items-center space-x-6">
+                          <div className="bg-blue-100 p-4 rounded-xl">
+                            <Package className="h-8 w-8 text-blue-600" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-xl text-gray-900 mb-1">
+                              Order #{order._id.slice(-8).toUpperCase()}
+                            </h3>
+                            <p className="text-gray-600 mb-2">
+                              Ordered on {formatDate(order.createdAt)} • {order.products?.length || 0} items
+                            </p>
+                            <Badge className={`${getStatusColor(order.orderStatus?.name || "")} border font-semibold`}>
+                              {order.orderStatus?.name || "Unknown"}
+                            </Badge>
+                          </div>
                         </div>
-                        <div>
-                          <h3 className="font-bold text-xl text-gray-900 mb-1">{order.id}</h3>
-                          <p className="text-gray-600 mb-2">
-                            Ordered on {order.date} • {order.items} items
-                          </p>
-                          <Badge className={`${getStatusColor(order.status)} border font-semibold`}>
-                            {order.status}
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-6">
-                        <div className="text-right">
-                          <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-                          <p className="text-2xl font-bold text-gray-900">${order.total}</p>
-                        </div>
-                        <div className="flex flex-col space-y-2">
-                          <Button variant="outline" size="sm" className="border-2 bg-transparent">
-                            View Details
-                          </Button>
-                          {order.status === "Delivered" && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="text-orange-600 border-orange-600 hover:bg-orange-50 bg-transparent"
-                            >
-                              Reorder
+                        <div className="flex items-center space-x-6">
+                          <div className="text-right">
+                            <p className="text-sm text-gray-600 mb-1">Total Amount</p>
+                            <p className="text-2xl font-bold text-gray-900">₹{order.totalAmount}</p>
+                          </div>
+                          <div className="flex flex-col space-y-2">
+                            <Button variant="outline" size="sm" className="border-2 bg-transparent">
+                              View Details
                             </Button>
-                          )}
+                            {order.orderStatus?.name === "Delivered" && (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="text-orange-600 border-orange-600 hover:bg-orange-50 bg-transparent"
+                              >
+                                Reorder
+                              </Button>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+
+                      {/* Product summary */}
+                      {order.products && order.products.length > 0 && (
+                        <div className="mt-4 pt-4 border-t">
+                          <div className="flex flex-wrap gap-3">
+                            {order.products.map((item: any, idx: number) => (
+                              <div key={idx} className="flex items-center gap-2 bg-gray-50 px-3 py-2 rounded-lg text-sm">
+                                <span className="font-medium">{item.product?.name || "Product"}</span>
+                                <span className="text-gray-400">×{item.quantity}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         </main>
       </div>

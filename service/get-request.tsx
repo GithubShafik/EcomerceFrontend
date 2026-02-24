@@ -64,3 +64,33 @@ export const getProductById = async (id: string) => {
   }
 };
 
+export const getMyOrders = async () => {
+  try {
+    const res = await axiosInstance.get(API_ENDPOINTS.getMyOrders);
+    return res?.data;
+  } catch (error) {
+    console.log("Error fetching my orders:", error);
+    throw error;
+  }
+};
+
+export const getAllOrders = async () => {
+  try {
+    const res = await axiosInstance.get(API_ENDPOINTS.getAllOrders);
+    return res?.data;
+  } catch (error) {
+    console.log("Error fetching all orders:", error);
+    throw error;
+  }
+};
+
+export const getOrderStatuses = async () => {
+  try {
+    const res = await axiosInstance.get(API_ENDPOINTS.getOrderStatuses);
+    return res?.data;
+  } catch (error) {
+    console.log("Error fetching order statuses:", error);
+    throw error;
+  }
+};
+

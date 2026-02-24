@@ -43,6 +43,7 @@ const AppSidebar = () => {
     const navItems = [
         { id: "dashboard", label: "Dashboard", icon: <Home className="h-5 w-5" />, href: "/dashboard", permission: permisstions?.Dashboard?.read, },
         { id: "dashboard", label: "AdminDashboard", icon: <Home className="h-5 w-5" />, href: "/admin_dashboard", permission: permisstions?.AdminDashboard?.read, },
+        { id: "manage-orders", label: "Manage Orders", icon: <Package className="h-5 w-5" />, href: "/admin_dashboard/manage-orders", permission: permisstions?.AdminDashboard?.read, },
         { id: "dashboard", label: "Manage Product", icon: <Home className="h-5 w-5" />, href: "/add-product", permission: permisstions?.ManageProduct?.read, },
         { id: "shop", label: "Shop Products", icon: <ShoppingBag className="h-5 w-5" />, href: "/shop", permission: permisstions?.ShopingProduct?.read, },
         { id: "cart", label: "Shopping Cart", icon: <ShoppingCart className="h-5 w-5" />, href: "/cart", permission: permisstions?.ShopingCart?.read, },
